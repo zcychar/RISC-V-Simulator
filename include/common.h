@@ -6,7 +6,7 @@ enum INST {
   sub,
   and_,
   or_,
-  xir,
+  xor_,
   sll,
   srl,
   sra,

@@ -5,7 +5,7 @@
 
 namespace sjtu {
 struct RSEntry {
-  INST instruction;
+  INST inst;
 };
 
 class RS {
@@ -14,9 +14,9 @@ class RS {
   void update();
 
  public:
-  std::array<RSEntry, 16> list;
+  std::array<RSEntry, 16> list = {};
 
  private:
-  std::array<RSEntry, 16> list_next;
+  std::array<RSEntry, 16> list_next = {};
 };
 }  // namespace sjtu
