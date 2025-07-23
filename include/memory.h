@@ -15,6 +15,6 @@ class memory {
   void store_word(unsigned int addr,unsigned int val);
 
  private:
-  std::array<unsigned char, 16 * PAGE_SIZE> pages = {};
+  std::array<unsigned char, 128 * PAGE_SIZE> pages = {};
 };
 }  // namespace sjtu

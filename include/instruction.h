@@ -9,7 +9,7 @@ struct DecodedInst {
   unsigned int rd,imm;
 };
 
-class instruction {
+class IU {
 public:
 
 private:

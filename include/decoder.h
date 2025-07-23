@@ -55,7 +55,7 @@ namespace sjtu {
               break;
             }
             default: {
-              break;
+              throw std::runtime_error("Invalid instruction");
             }
           }
           break;
@@ -64,7 +64,6 @@ namespace sjtu {
           unsigned int funct3=(x>>12)&0x7;
           inst.rd=(x>>7)&0x1F;
           inst.rs1=(x>>15)&0x7;
-
           switch (funct3) {
             case 0b000: {
               inst.inst=addi;
@@ -88,11 +87,168 @@ namespace sjtu {
             }
             case 0b001: {
               inst.inst=slli;
+              inst.imm=(x>>20)&0x1F;
+              break;
             }
+            case 0b101: {
+              unsigned int funct7=(x>>25)&0x7F;
+              inst.imm=(x>>20)&0x1F;
+              if(funct7==0b0000000) {
+                inst.inst=srli;
+              }else if(funct7==0b0100000) {
+                inst.inst=srai;
+              }else {
+                throw std::runtime_error("Invalid instruction");
+              }
+              break;
+            }
+            case 0b010: {
+              inst.inst=slti;
+              inst.imm=x>>20;
+              break;
+            }
+            case 0b011: {
+              inst.inst=sltiu;
+              inst.imm=x>>20;
+              break;
+            }
+            default:throw std::runtime_error("Invalid instruction");
           }
-
+          break;
         }
-        default: break;
+        case 0b0000011: {
+          unsigned int funct3=(x>>12)&0x7;
+          inst.rd=(x>>7)&0x1F;
+          inst.rs1=(x>>15)&0x7;
+          inst.imm=x>>20;
+          switch (funct3) {
+            case 0b000: {
+              inst.inst=lb;
+              break;
+            }
+            case 0b100: {
+              inst.inst=lbu;
+              break;
+            }
+            case 0b001: {
+              inst.inst=lh;
+              break;
+            }
+            case 0b101: {
+              inst.inst=lhu;
+              break;
+            }
+            case 0b010: {
+              inst.inst=lw;
+              break;
+            }
+            default: throw std::runtime_error("Invalid instruction");
+          }
+          break;
+        }
+        case 0b0100011: {
+          inst.rs1=(x>>15)&0x1F;
+          inst.rs2=(x>>20)&0x1F;
+          inst.imm=(x>>25)<<5|(x>>7)&0x1F;
+          unsigned int funct3=(x>>12)&0x7;
+          switch (funct3) {
+            case 0b000: {
+              inst.inst=sb;
+              break;
+            }
+            case 0b001: {
+              inst.inst=sh;
+              break;
+            }
+            case 0b010: {
+              inst.inst=sw;
+              break;
+            }
+            default: throw std::runtime_error("Invalid instruction");
+          }
+          break;
+        }
+        case 0b1100011: {
+          inst.rs1=(x>>15)&0x1F;
+          inst.rs2=(x>>20)&0x1F;
+          unsigned int imm12 = (x >> 31) & 0x1;
+          unsigned int imm10_5 = (x >> 25) & 0x3F;
+          unsigned int imm4_1 = (x >> 8) & 0xF;
+          unsigned int imm11 = (x >> 7) & 0x1;
+          inst.imm = (imm12 << 12) | (imm11 << 11) | (imm10_5 << 5) | (imm4_1 << 1);
+          unsigned int funct3=(x>>12)&0x7;
+          switch (funct3) {
+            case 0b000: {
+              inst.inst=beq;
+              break;
+            }
+            case 0b101: {
+              inst.inst=bge;
+              break;
+            }
+            case 0b111: {
+              inst.inst=bgeu;
+              break;
+            }
+            case 0b100: {
+              inst.inst=blt;
+              break;
+            }
+            case 0b110: {
+              inst.inst=bltu;
+              break;
+            }
+            case 0b001: {
+              inst.inst=bne;
+              break;
+            }
+            default: throw std::runtime_error("Invalid instruction");
+          }
+          break;
+        }
+        case 0b1101111: {
+          unsigned int imm20 = (x>> 31) & 0x1;
+          unsigned int imm10_1 = (x >> 21) & 0x3FF;
+          unsigned int imm11 = (x >> 20) & 0x1;
+          unsigned int imm19_12 = (x >> 12) & 0xFF;
+          inst.imm = (imm20 << 20) | (imm19_12 << 12) | (imm11 << 11) | (imm10_1 << 1);
+          inst.rd=(x>>7)&0x1F;
+          inst.inst=jal;
+          break;
+        }
+        case 0b1100111: {
+          inst.imm=(x>>20);
+          inst.rd=(x>>7)&0x1F;
+          inst.rs1=(x>>15)&0x1F;
+          inst.inst=jalr;
+          break;
+        }
+        case 0b0010111: {
+          inst.imm=x & 0xFFFFF000;
+          inst.rd=(x>>7)&0x1F;
+          inst.inst=auipc;
+          break;
+        }
+        case 0b0110111: {
+          inst.imm=x & 0xFFFFF000;
+          inst.rd=(x>>7)&0x1F;
+          inst.inst=lui;
+          break;
+        }
+        case 0b1110011: {
+          inst.imm=(x>>20);
+          inst.rd=(x>>7)&0x1F;
+          inst.rs1=(x>>15)&0x1F;
+          if(inst.imm==0) {
+            inst.inst=ebreak;
+          }else if(inst.inst==1) {
+            inst.inst=ecall;
+          }else {
+            throw std::runtime_error("Invalid instruction");
+          }
+          break;
+        }
+        default: throw std::runtime_error("Invalid instruction");
       }
       return inst;
     }
