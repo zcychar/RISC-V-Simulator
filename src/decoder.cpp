@@ -1,6 +1,6 @@
 #include "decoder.h"
 
-sjtu::DecodedInst sjtu::decoder::decode(u_int32_t x) {
+sjtu::DecodedInst sjtu::decoder::decode(int32_t x) {
     DecodedInst inst{};
     u_int32_t opcode = x & 0x7F;
     switch (opcode) {

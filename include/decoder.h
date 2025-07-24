@@ -4,7 +4,7 @@
 namespace sjtu {
 class decoder {
  public:
-  DecodedInst decode(u_int32_t x);
+  DecodedInst decode(int32_t x);
 
   void evaluate();
 

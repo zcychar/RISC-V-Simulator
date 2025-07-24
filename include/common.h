@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 
 namespace sjtu {
 enum INST {
@@ -39,6 +40,7 @@ enum INST {
   jalr,
   auipc,
   lui,
+  null,
 };
 
 struct DecodedInst;
