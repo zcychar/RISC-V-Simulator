@@ -39,9 +39,49 @@ enum INST {
   jalr,
   auipc,
   lui,
-  ebreak,
-  ecall
 };
+
+struct DecodedInst;
+
+template <typename T>
+struct List {
+  List() : first(0), last(0), size(0) {}
+
+  bool full() const {
+    return size == list.size();
+  }
+
+  bool empty() const {
+    return size == 0;
+  }
+
+  T& operator[](u_int32_t x) {
+    return list[x];
+  }
+
+  void pop() {
+    if (empty()) {
+      return;
+    }
+    first = (first + 1) % list.size();
+    --size;
+  }
+
+  int push(const T& val) {
+    if (full()) {
+      return -1;
+    }
+    list[last] = val;
+    last = (last + 1) % list.size();
+    ++size;
+    return last;
+  }
+
+  std::array<T, 16> list{};
+  u_int32_t first, last;
+  u_int32_t size;
+};
+
 
 #define PAGE_SIZE 4096
 }  // namespace sjtu

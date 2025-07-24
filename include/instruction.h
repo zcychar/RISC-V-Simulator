@@ -5,21 +5,31 @@ namespace sjtu {
 
 struct DecodedInst {
   INST inst;
-  unsigned int rs1,rs2;
-  unsigned int rd,imm;
+  u_int32_t rs1, rs2;
+  u_int32_t rd, imm;
 };
 
 class IU {
-public:
+ public:
+  void evaluate();
 
-private:
+  void update();
 
-  memory* mem=nullptr;
+  u_int32_t pc;
 
-  unsigned int addr=0;
+  DecodedInst inst;
 
-  unsigned int addr_next=0;
+  bool stall;
 
+  bool ready;
 
+ private:
+  u_int32_t pc_next = 0;
+
+  DecodedInst inst_next{};
+
+  bool stall_ready = 0;
+
+  bool ready_next = 0;
 };
 }  // namespace sjtu
