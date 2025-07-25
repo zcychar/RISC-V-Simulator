@@ -1,35 +1,38 @@
 #pragma once
+
 #include <memory.h>
 
-namespace sjtu {
+#include "common.h"
 
-struct DecodedInst {
-  INST inst;
-  u_int32_t rs1, rs2;
-  u_int32_t rd, imm;
-};
+namespace sjtu {
+class decoder;
+class RoB;
+class MU;
 
 class IU {
  public:
-  void evaluate();
+  void evaluate(RoB &rob, decoder &decoder, MU &mu);
 
-  void update();
+  void reset() { stall_next = true; }
 
-  u_int32_t pc;
+  void update() {
+    pc = pc_next;
+    inst = inst_next;
+    stall = stall_next;
+    ready = ready_next;
+  };
 
-  DecodedInst inst;
-
-  bool stall;
-
-  bool ready;
+  u_int32_t pc = 0;
+  DecodedInst inst{};
+  bool stall = false;
+  bool ready = false;
+  u_int32_t addr = 0;
 
  private:
   u_int32_t pc_next = 0;
-
   DecodedInst inst_next{};
-
-  bool stall_ready = 0;
-
-  bool ready_next = 0;
+  bool stall_next = false;
+  bool ready_next = false;
+  u_int32_t addr_next = 0;
 };
 }  // namespace sjtu

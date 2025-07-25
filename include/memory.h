@@ -4,6 +4,9 @@
 
 #include "common.h"
 namespace sjtu {
+struct LSBEntry;
+}
+namespace sjtu {
 
 enum MemoryType{};
 class memory {
@@ -20,13 +23,22 @@ class memory {
   std::array<unsigned char, 128 * PAGE_SIZE> pages = {};
 };
 
-class mu {
+class MU {
  public:
-  mu(memory *mem) : mem(mem) {}
 
-  void evaluate();
+  void evaluate(memory& mem) {
 
-  void update();
+  };
+
+  void set_val(LSBEntry &entry);
+
+  void update() {
+   remain=remain_next;
+   addr=addr_next;
+   value=value_next;
+   type=type_next;
+   rob_id=rob_id_next;
+  };
 
  u_int32_t remain=0;
  u_int32_t addr=0;
@@ -35,7 +47,6 @@ class mu {
  u_int32_t rob_id=0;
 
  private:
-  memory *mem;
 
  u_int32_t remain_next=0;
  u_int32_t addr_next=0;

@@ -1,4 +1,7 @@
 #include "memory.h"
+
+#include <LSB.h>
+
 #include <sstream>
 
 void sjtu::memory::init(std::istream &in) {
@@ -26,20 +29,28 @@ void sjtu::memory::init(std::istream &in) {
 }
 
 unsigned char sjtu::memory::load_byte(u_int32_t addr) const {
-  return *reinterpret_cast<unsigned char const *>(pages.data()+addr);
+  return *reinterpret_cast<unsigned char const *>(pages.data() + addr);
 }
 unsigned short sjtu::memory::load_half(u_int32_t addr) const {
-  return *reinterpret_cast<unsigned short const *>(pages.data()+addr);
+  return *reinterpret_cast<unsigned short const *>(pages.data() + addr);
 }
 u_int32_t sjtu::memory::load_word(u_int32_t addr) const {
-  return *reinterpret_cast<u_int32_t const *>(pages.data()+addr);
+  return *reinterpret_cast<u_int32_t const *>(pages.data() + addr);
 }
 void sjtu::memory::store_byte(u_int32_t addr, unsigned char val) {
-  *reinterpret_cast<unsigned char *>(pages.data()+addr)=val;
+  *reinterpret_cast<unsigned char *>(pages.data() + addr) = val;
 }
 void sjtu::memory::store_half(u_int32_t addr, unsigned short val) {
-  *reinterpret_cast<unsigned short *>(pages.data()+addr)=val;
+  *reinterpret_cast<unsigned short *>(pages.data() + addr) = val;
 }
 void sjtu::memory::store_word(u_int32_t addr, u_int32_t val) {
-  *reinterpret_cast<u_int32_t *>(pages.data()+addr)=val;
+  *reinterpret_cast<u_int32_t *>(pages.data() + addr) = val;
+}
+
+void sjtu::MU::set_val(LSBEntry &entry) {
+  remain_next = 3;
+  addr_next = entry;
+  rob_id_next = entry.dest;
+  type_next =
+    value_next = 0;
 }
