@@ -4,7 +4,7 @@
 #include "decoder.h"
 #include "memory.h"
 
-void sjtu::IU::evaluate(RoB &rob, decoder &decoder, MU &mu) {
+void sjtu::IU::evaluate(RoB &rob, decoder &decoder, memory &mem) {
   if (!rob.reset) {
     if (!decoder.ready) {
       ready_next = true;
@@ -18,12 +18,15 @@ void sjtu::IU::evaluate(RoB &rob, decoder &decoder, MU &mu) {
   }
   ready_next = true;
   if (rob.reset) {
-    pc_next = rob.pc;
+    PC_next = rob.pc;
   } else if (decoder.set_pc) {
-    pc_next = decoder.pc;
+    PC_next = decoder.pc;
   } else {
-    pc_next = pc + 4;
+    PC_next = PC + 4;
   }
+  u_int32_t instr=mem.load_word(PC_next);
+  inst_next=decoder.decode(instr);
+
 
   u_int32_t raw_inst ;
 };

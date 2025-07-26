@@ -1,9 +1,13 @@
 #pragma once
 #include "common.h"
-
+/**
+ * The ALU unit is used to do the calculation. Since in this alu all calculation
+ * only needs one cycle to be dealt.ALU is ready to receive new instruction in
+ * every cycle and the result will be displayed in the very next cycle.
+ */
 namespace sjtu {
 
-class alu {
+class ALU {
  public:
   void load(INST inst, u_int32_t in1, u_int32_t in2, u_int32_t rob_id) {
     inst_next = inst;

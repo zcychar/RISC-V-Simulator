@@ -1,5 +1,7 @@
 #include "decoder.h"
 
+#include <mutex>
+
 #include "LSB.h"
 #include "RS.h"
 #include "RoB.h"
@@ -248,12 +250,13 @@ sjtu::DecodedInst sjtu::decoder::decode(int32_t x) {
   return inst;
 }
 
-void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg) {
+void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predictor &predictor) {
   if (rob.reset) {
     ready_next = true;
     return;
   }
   if (!iu.ready) {
+    ready_next=false;
     return;
   }
   if (rob.full()) {
@@ -278,7 +281,7 @@ void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg) {
         iu.reset();
         return;
       }
-      u_int32_t rob_id = rob.push(RoBEntry{inst, false, inst.rd, 0});
+      u_int32_t rob_id = rob.load(RoBEntry{toreg, inst, false, inst.rd, 0});
       RSEntry entry{true, inst.inst, 0, 0, 0, 0, rob_id, false, false};
       if (reg.b[inst.rs1]) {
         entry.Qj = reg.q[inst.rs1];
@@ -309,7 +312,7 @@ void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg) {
         iu.reset();
         return;
       }
-      u_int32_t rob_id = rob.push(RoBEntry{inst, false, inst.rd, 0});
+      u_int32_t rob_id = rob.load(RoBEntry{toreg, inst, false, inst.rd, 0});
       RSEntry entry{true, inst.inst, 0, inst.imm, 0, 0, rob_id, false, false};
       if (reg.b[inst.rs1]) {
         entry.Qj = reg.q[inst.rs1];
@@ -330,8 +333,8 @@ void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg) {
         iu.reset();
         return;
       }
-      u_int32_t rob_id = rob.push(RoBEntry{inst, false, inst.rd, 0});
-      LSBEntry entry{true, false, inst.inst, 0, 0, 0, 0, rob_id, inst.imm, false, false};
+      u_int32_t rob_id = rob.load(RoBEntry{toreg, inst, false, inst.rd, 0});
+      LSBEntry entry{true, inst.inst, 0, 0, 0, 0, rob_id, inst.imm, false, false};
       if (reg.b[inst.rs1]) {
         entry.Qj = reg.q[inst.rs1];
         entry.Dj = true;
@@ -349,8 +352,8 @@ void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg) {
         iu.reset();
         return;
       }
-      u_int32_t rob_id = rob.push(RoBEntry{inst, false, inst.rd, 0});
-      LSBEntry entry{true, false, inst.inst, 0, 0, 0, 0, rob_id, inst.imm, false, false};
+      u_int32_t rob_id = rob.load(RoBEntry{tonone, inst, false, inst.rd, 0});
+      LSBEntry entry{true, inst.inst, 0, 0, 0, 0, rob_id, inst.imm, false, false};
       if (reg.b[inst.rs1]) {
         entry.Qj = reg.q[inst.rs1];
         entry.Dj = true;
@@ -372,9 +375,40 @@ void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg) {
     case bge:
     case bltu:
     case bgeu: {
+      if (rs.full()) {
+        ready_next = false;
+        return;
+      }
+      u_int32_t rob_id;
+      if (predictor.predict(iu.PC)) {
+        rob_id = rob.load({toaddr, inst, false, 0, 0, iu.PC, iu.PC + 4});
+        pc_next = iu.PC + inst.imm;
+      } else {
+        rob_id = rob.load({toaddr, inst, false, 0, 0, iu.PC, iu.PC + inst.imm});
+        pc_next = iu.PC + 4;
+      }
+      RSEntry entry{true, inst.inst, 0, 0, 0, 0, rob_id, false, false};
+      if (reg.b[inst.rs1]) {
+        entry.Qj = reg.q[inst.rs1];
+        entry.Dj = true;
+      } else {
+        entry.Vj = reg[inst.rs1];
+      }
+      if (reg.b[inst.rs2]) {
+        entry.Qk = reg.q[inst.rs2];
+        entry.Dk = true;
+      } else {
+        entry.Vk = reg[inst.rs2];
+      }
+      rs.load(entry);
+      break;
     }
 
     case jal: {
+      rob.load({toreg, inst, true, inst.rd, iu.PC + 4, iu.PC, 0});
+      set_pc_next = true;
+      pc_next = (iu.PC + inst.imm) & ~1;
+      break;
     }
     case jalr: {
       if (reg.b[inst.rs1]) {
@@ -382,10 +416,20 @@ void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg) {
         iu.reset();
         return;
       }
+      rob.load({toreg, inst, true, inst.rd, iu.PC + 4, iu.PC, 0});
+      set_pc_next = true;
+      pc_next = (reg[inst.rs1] + inst.imm) & ~1;
+      break;
     }
 
-    case lui:
-    case auipc:
+    case lui: {
+      rob.load({toreg,inst,true,inst.rd,inst.imm<<12});
+      break;
+    }
+    case auipc: {
+      rob.load({toreg,inst,true,inst.rd,iu.PC+inst.imm<<12});
+      break;
+    }
     default:
       throw std::runtime_error("Invalid instruction!");
   }

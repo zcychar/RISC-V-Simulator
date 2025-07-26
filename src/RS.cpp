@@ -1,20 +1,20 @@
 #include "RS.h"
-#include "RoB.h"
-#include "LSB.h"
+
 #include "ALU.h"
+#include "LSB.h"
+#include "RoB.h"
 #include "memory.h"
 
 void sjtu::RS::evaluate(RoB &rob, LSB &lsb) {
   if (rob.reset) {
     for (int i = 0; i < 16; ++i) {
       list_next[i].busy = false;
-
     }
     alu->load(null, 0, 0, 0);
     return;
   }
   for (int i = 0; i < 16; ++i) {
-    if (!list[i].busy)continue;
+    if (!list[i].busy) continue;
     if (alu->ready) {
       if (list[i].Dj && list[i].Qj == alu->rob_id) {
         list_next[i].Dj = false;
@@ -41,7 +41,7 @@ void sjtu::RS::evaluate(RoB &rob, LSB &lsb) {
     }
   }
   for (int i = 0; i < 16; ++i) {
-    if (list_next[i].busy) {
+    if (list[i].busy) {
       if (!list_next[i].Dj && !list_next[i].Dk) {
         alu->load(list_next[i].inst, list_next[i].Vj, list_next[i].Vk, list_next[i].dest);
         list_next[i].busy = false;

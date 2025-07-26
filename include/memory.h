@@ -4,6 +4,15 @@
 
 #include "common.h"
 
+/**
+ *The MU structure is designed to deal with load_store instruction, it functions
+ *almost the identical way as ALU. For each cycle, it first calculate how much
+ *time does the current instruction has to last. If it's reduced to zero then
+ *this unit performs the corresponding operation to real memory. Set the value if
+ *it's an load instruction and reset the ready sign to true to indicate this unit
+ *is ready to give results and receive a new instruction.
+ */
+
 namespace sjtu {
   class memory {
   public:

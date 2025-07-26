@@ -2,51 +2,50 @@
 
 #include "common.h"
 
-
+/**
+ * The reserve station serves all the instruction which needs to do calculation,
+ * so it will work closely with alu unit. It first updates its instructions'
+ * register dependency based on the results of alu and lsb. Then it choosees an
+ * instruction which has both independent operation values (if exists) and send
+ * to alu for calculation. Since all calculation needs only one cycle, we can
+ * free the slot in the next cycle.
+ */
 namespace sjtu {
-  class LSB;
-  class RoB;
-  class alu;
+class LSB;
+class RoB;
+class ALU;
 
-  class RS {
-  public:
-    RS(alu* alu):alu(alu){}
+class RS {
+ public:
+  RS(ALU *alu) : alu(alu) {}
 
-    void evaluate(RoB &rob, LSB &lsb);
+  void evaluate(RoB &rob, LSB &lsb);
 
-    void update() {
-      list = list_next;
-    }
+  void update() { list = list_next; }
 
-    bool full() {
-      for (int i = 0; i < 16; ++i) {
-        if (list[i].busy == false) {
-          return false;
-        }
+  bool full() {
+    for (int i = 0; i < 16; ++i) {
+      if (list[i].busy == false) {
+        return false;
       }
-      return true;
     }
+    return true;
+  }
 
-    void load(RSEntry x) {
-      for (int i = 0; i < 16; ++i) {
-        if (list_next[i].busy == false) {
-          list_next[i] = x;
-          return;
-        }
+  void load(RSEntry x) {
+    for (int i = 0; i < 16; ++i) {
+      if (list_next[i].busy == false) {
+        list_next[i] = x;
+        return;
       }
-      throw std::runtime_error("Trying to add into a full list!");
     }
+    throw std::runtime_error("Trying to add into a full list!");
+  }
 
-    std::array<RSEntry, 16> list = {};
-    bool ready = false;
-    u_int32_t value = 0;
-    u_int32_t rob_id = 0;
-    alu* alu=nullptr;
+  std::array<RSEntry, 16> list = {};
+  ALU *alu = nullptr;
 
-  private:
-    std::array<RSEntry, 16> list_next = {};
-    bool ready_next = false;
-    u_int32_t value_next = 0;
-    u_int32_t rob_id_next = 0;
-  };
-} // namespace sjtu
+ private:
+  std::array<RSEntry, 16> list_next = {};
+};
+}  // namespace sjtu
