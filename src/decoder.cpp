@@ -10,7 +10,8 @@ sjtu::DecodedInst sjtu::decoder::decode(int32_t x) {
   DecodedInst inst{};
   u_int32_t opcode = x & 0x7F;
   switch (opcode) {
-    case 0b0110011: {  // R
+    case 0b0110011: {
+      // R
       u_int32_t funct = ((x >> 12) & 0x7) << 7 | (x >> 25) & 0x7F;
       inst.rd = (x >> 7) & 0x1F;
       inst.rs1 = (x >> 15) & 0x1F;
@@ -291,7 +292,7 @@ void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg) {
       } else {
         entry.Vk = reg[inst.rs2];
       }
-      rs.push(entry);
+      rs.load(entry);
       return;
     }
     case addi:
@@ -316,7 +317,7 @@ void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg) {
       } else {
         entry.Vj = reg[inst.rs1];
       }
-      rs.push(entry);
+      rs.load(entry);
       return;
     }
     case lb:
@@ -330,14 +331,14 @@ void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg) {
         return;
       }
       u_int32_t rob_id = rob.push(RoBEntry{inst, false, inst.rd, 0});
-      LSBEntry entry{true, inst.inst, 0, 0, 0, 0, rob_id, inst.imm, false, false};
+      LSBEntry entry{true, false, inst.inst, 0, 0, 0, 0, rob_id, inst.imm, false, false};
       if (reg.b[inst.rs1]) {
         entry.Qj = reg.q[inst.rs1];
         entry.Dj = true;
       } else {
         entry.Vj = reg[inst.rs1];
       }
-      lsb.push(entry);
+      lsb.load(entry);
       return;
     }
     case sb:
@@ -349,7 +350,7 @@ void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg) {
         return;
       }
       u_int32_t rob_id = rob.push(RoBEntry{inst, false, inst.rd, 0});
-      LSBEntry entry{true, inst.inst, 0, 0, 0, 0, rob_id, inst.imm, false, false};
+      LSBEntry entry{true, false, inst.inst, 0, 0, 0, 0, rob_id, inst.imm, false, false};
       if (reg.b[inst.rs1]) {
         entry.Qj = reg.q[inst.rs1];
         entry.Dj = true;
@@ -362,7 +363,7 @@ void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg) {
       } else {
         entry.Vk = reg[inst.rs2];
       }
-      lsb.push(entry);
+      lsb.load(entry);
       return;
     }
     case beq:
@@ -374,15 +375,13 @@ void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg) {
     }
 
     case jal: {
-
     }
     case jalr: {
-      if(reg.b[inst.rs1]) {
-        ready_next=false;
+      if (reg.b[inst.rs1]) {
+        ready_next = false;
         iu.reset();
         return;
       }
-
     }
 
     case lui:

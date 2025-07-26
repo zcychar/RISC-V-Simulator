@@ -1,58 +1,57 @@
 #pragma once
+#include <RoB.h>
+
 #include "common.h"
 
 namespace sjtu {
+  class RS;
+  class RoB;
+  class MU;
 
-struct LSBEntry {
-  bool busy;
-  INST inst;
-  u_int32_t Vj, Vk, Qj, Qk;
-  u_int32_t dest;
-  u_int32_t imm;
-  bool Dj, Dk;
-};
+  struct LSBEntry {
+    bool busy;
+    bool wait;
+    INST inst;
+    u_int32_t Vj, Vk, Qj, Qk;
+    u_int32_t dest;
+    u_int32_t imm;
+    bool Dj, Dk;
+  };
 
-class LSB {
- public:
-  bool full() {
-    for (int i = 0; i < 16; ++i) {
-      if (list[i].busy == false) {
-        return false;
-      }
+  class LSB {
+  public:
+    LSB(MU *mu): mu(mu) {
     }
-    return true;
-  }
 
-  void push(LSBEntry x) {
-    for (int i = 0; i < 16; ++i) {
-      if (list_next[i].busy == false) {
-        list_next[i] = x;
-        return;
+    bool full() {
+      for (int i = 0; i < 16; ++i) {
+        if (list[i].busy == false) {
+          return false;
+        }
       }
+      return true;
     }
-    throw std::runtime_error("Trying to add into a full list!");
-  }
 
-  void evaluate();
+    void load(LSBEntry x) {
+      for (int i = 0; i < 16; ++i) {
+        if (list_next[i].busy == false) {
+          list_next[i] = x;
+          return;
+        }
+      }
+      throw std::runtime_error("Trying to add into a full list!");
+    }
 
-  void update() {
-    list = list_next;
-    load_ready = load_ready_next;
-    rob_id = rob_id_next;
-    value = value_next;
-    rob_id_next = 0;
-    load_ready_next = false;
-  }
+    void evaluate(RS &rs, RoB &rob);
 
-  List<LSBEntry> list{};
-  bool load_ready = false;
-  u_int32_t rob_id = 0;
-  u_int32_t value = 0;
+    void update() {
+      list = list_next;
+    }
 
- private:
-  List<LSBEntry> list_next{};
-  bool load_ready_next = false;
-  u_int32_t rob_id_next = 0;
-  u_int32_t value_next = 0;
-};
-}  // namespace sjtu
+    List<LSBEntry> list{};
+    MU *mu = nullptr;
+
+  private:
+    List<LSBEntry> list_next{};
+  };
+} // namespace sjtu

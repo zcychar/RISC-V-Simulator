@@ -16,7 +16,7 @@ class RoB {
 
   int push(RoBEntry entry) { return list_next.push(entry); }
 
-  void evaluate() {}
+  void evaluate();
 
   void update();
 

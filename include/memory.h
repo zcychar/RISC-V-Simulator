@@ -3,55 +3,59 @@
 #include <istream>
 
 #include "common.h"
+
 namespace sjtu {
-struct LSBEntry;
-}
-namespace sjtu {
+  class memory {
+  public:
+    void init(std::istream &in);
 
-enum MemoryType{};
-class memory {
- public:
-  void init(std::istream &in);
-  unsigned char load_byte(u_int32_t addr) const;
-  unsigned short load_half(u_int32_t addr) const;
-  u_int32_t load_word(u_int32_t addr) const;
-  void store_byte(u_int32_t addr, unsigned char val);
-  void store_half(u_int32_t addr, unsigned short val);
-  void store_word(u_int32_t addr, u_int32_t val);
+    unsigned char load_byte(u_int32_t addr) const;
 
- private:
-  std::array<unsigned char, 128 * PAGE_SIZE> pages = {};
-};
+    unsigned short load_half(u_int32_t addr) const;
 
-class MU {
- public:
+    u_int32_t load_word(u_int32_t addr) const;
 
-  void evaluate(memory& mem) {
+    void store_byte(u_int32_t addr, unsigned char val);
 
+    void store_half(u_int32_t addr, unsigned short val);
+
+    void store_word(u_int32_t addr, u_int32_t val);
+
+  private:
+    std::array<unsigned char, 128 * PAGE_SIZE> pages = {};
   };
 
-  void set_val(LSBEntry &entry);
+  class RoB;
 
-  void update() {
-   remain=remain_next;
-   addr=addr_next;
-   value=value_next;
-   type=type_next;
-   rob_id=rob_id_next;
+  class MU {
+  public:
+    void evaluate(memory &mem, RoB &rob);
+
+    void load(u_int32_t addr, u_int32_t rob_id,u_int32_t value, INST inst);
+
+    void update() {
+      remain = remain_next;
+      addr = addr_next;
+      value = value_next;
+      type = type_next;
+      rob_id = rob_id_next;
+      ready = ready_next;
+      ready_next=false;
+    };
+
+    u_int32_t remain = 0;
+    u_int32_t addr = 0;
+    u_int32_t value = 0;
+    INST type{};
+    u_int32_t rob_id = 0;
+    bool ready = false;
+
+  private:
+    u_int32_t remain_next = 0;
+    u_int32_t addr_next = 0;
+    u_int32_t value_next = 0;
+    INST type_next{};
+    u_int32_t rob_id_next = 0;
+    bool ready_next = false;
   };
-
- u_int32_t remain=0;
- u_int32_t addr=0;
- u_int32_t value=0;
- MemoryType type{};
- u_int32_t rob_id=0;
-
- private:
-
- u_int32_t remain_next=0;
- u_int32_t addr_next=0;
- u_int32_t value_next=0;
- MemoryType type_next{};
- u_int32_t rob_id_next=0;
-};
-}  // namespace sjtu
+} // namespace sjtu
