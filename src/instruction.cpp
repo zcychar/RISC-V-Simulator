@@ -4,7 +4,7 @@
 #include "decoder.h"
 #include "memory.h"
 
-void sjtu::IU::evaluate(RoB &rob, decoder &decoder, memory &mem) {
+void sjtu::IU::evaluate(RoB &rob, Decoder &decoder, memory &mem) {
   if (!rob.reset) {
     if (!decoder.ready) {
       ready_next = true;

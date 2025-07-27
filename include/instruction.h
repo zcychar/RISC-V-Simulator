@@ -14,14 +14,14 @@
 #include "common.h"
 
 namespace sjtu {
-class decoder;
+class Decoder;
 class RoB;
 class MU;
 class memory;
 
 class IU {
  public:
-  void evaluate(RoB &rob, decoder &decoder, memory &mem);
+  void evaluate(RoB &rob, Decoder &decoder, memory &mem);
 
   void reset() { stall_next = true; }
 

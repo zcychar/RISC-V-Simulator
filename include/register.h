@@ -5,8 +5,8 @@ namespace sjtu {
 struct RegEntry {};
 class REG {
  public:
-  void evaluate(bool reset) {
-    if (reset) {
+  void evaluate(RoB &rob) {
+    if (rob.reset) {
       q_next.fill(0);
       b_next.fill(false);
     }

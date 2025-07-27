@@ -8,7 +8,7 @@
 #include "instruction.h"
 #include "register.h"
 
-sjtu::DecodedInst sjtu::decoder::decode(int32_t x) {
+sjtu::DecodedInst sjtu::Decoder::decode(int32_t x) {
   DecodedInst inst{};
   u_int32_t opcode = x & 0x7F;
   switch (opcode) {
@@ -250,7 +250,7 @@ sjtu::DecodedInst sjtu::decoder::decode(int32_t x) {
   return inst;
 }
 
-void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predictor &predictor) {
+void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predictor &predictor) {
   if (rob.reset) {
     ready_next = true;
     return;
@@ -435,7 +435,7 @@ void sjtu::decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
   }
 };
 
-void sjtu::decoder::update() {
+void sjtu::Decoder::update() {
   set_pc = set_pc_next;
   pc = pc_next;
   ready = ready_next;

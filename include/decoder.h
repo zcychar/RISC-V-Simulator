@@ -22,7 +22,7 @@ class RoB;
 class REG;
 class Predictor;
 
-class decoder {
+class Decoder {
  public:
   DecodedInst decode(int32_t x);
 
