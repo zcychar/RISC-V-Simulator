@@ -24,6 +24,7 @@ class Predictor;
 
 class Decoder {
  public:
+ Decoder():ready_next(true){}
   DecodedInst decode(int32_t x);
 
   void evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predictor &predictor);

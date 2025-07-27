@@ -10,7 +10,7 @@
 
 namespace sjtu {
 class CPU {
-public:
+ public:
   CPU() {
     rob = new RoB;
     iu = new IU;
@@ -34,10 +34,10 @@ public:
         evaluate();
         update();
       }
-    } catch (std::runtime_error &err) {
-      throw err.what();
+    } catch (u_int32_t num) {
+      std::cout << num << std::endl;
     } catch (...) {
-      return;
+      throw;
     }
   }
 

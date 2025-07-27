@@ -42,6 +42,9 @@ void sjtu::RoB::evaluate(REG &reg, RS &rs, LSB &lsb, Predictor &predictor) {
         }
         break;
       }
+      case toexit: {
+        throw reg[10]&0xFF;
+      }
       default:
         break;
     }

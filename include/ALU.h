@@ -9,6 +9,8 @@ namespace sjtu {
 
 class ALU {
  public:
+  ALU():ready_next(true){}
+
   void load(INST inst, u_int32_t in1, u_int32_t in2, u_int32_t rob_id) {
     inst_next = inst;
     in1_next = in1;

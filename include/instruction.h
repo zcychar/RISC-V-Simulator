@@ -21,15 +21,25 @@ class memory;
 
 class IU {
  public:
+  IU():ready_next(true){}
+
   void evaluate(RoB &rob, Decoder &decoder, memory &mem);
 
-  void reset() { stall_next = true; }
+  void revert() {
+    PC_next = PC;
+    inst_next = inst;
+    stall_next = stall;
+    ready_next = ready;
+    revert_cond_ = true;
+  }
 
   void update() {
     PC = PC_next;
     inst = inst_next;
     stall = stall_next;
     ready = ready_next;
+    revert_cond_ = false;
+    ready_next = false;
   };
 
   DecodedInst inst{};
@@ -42,5 +52,6 @@ class IU {
   bool stall_next = false;
   bool ready_next = false;
   u_int32_t PC_next = 0;
+  bool revert_cond_ = false;
 };
 }  // namespace sjtu

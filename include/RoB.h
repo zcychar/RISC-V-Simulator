@@ -22,7 +22,7 @@ class RS;
 class LSB;
 class Predictor;
 
-enum RoBType { toreg, toaddr, tonone };
+enum RoBType { toreg, toaddr, tonone,toexit };
 
 struct RoBEntry {
   RoBType type;

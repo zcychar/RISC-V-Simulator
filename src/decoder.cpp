@@ -1,5 +1,8 @@
 #include "decoder.h"
 
+#include <ALU.h>
+#include <memory.h>
+
 #include <mutex>
 
 #include "LSB.h"
@@ -9,6 +12,9 @@
 #include "register.h"
 
 sjtu::DecodedInst sjtu::Decoder::decode(int32_t x) {
+  if (x == 0x0ff00513) {
+    return {exit};
+  }
   DecodedInst inst{};
   u_int32_t opcode = x & 0x7F;
   switch (opcode) {
@@ -256,11 +262,12 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     return;
   }
   if (!iu.ready) {
-    ready_next=false;
+    ready_next = true;
     return;
   }
   if (rob.full()) {
-    iu.reset();
+    ready_next = false;
+    iu.revert();
     return;
   }
   ready_next = true;
@@ -278,20 +285,36 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     case and_: {
       if (rs.full()) {
         ready_next = false;
-        iu.reset();
+        iu.revert();
         return;
       }
       u_int32_t rob_id = rob.load(RoBEntry{toreg, inst, false, inst.rd, 0});
       RSEntry entry{true, inst.inst, 0, 0, 0, 0, rob_id, false, false};
       if (reg.b[inst.rs1]) {
-        entry.Qj = reg.q[inst.rs1];
-        entry.Dj = true;
+        if (rob.list[reg.q[inst.rs1]].done) {
+          entry.Vj = rob.list[reg.q[inst.rs1]].value;
+        } else if (rs.alu->ready && reg.q[inst.rs1] == rs.alu->rob_id) {
+          entry.Vj = rs.alu->value;
+        } else if (lsb.mu->ready && reg.q[inst.rs1] == lsb.mu->rob_id) {
+          entry.Vj = lsb.mu->value;
+        } else {
+          entry.Qj = reg.q[inst.rs1];
+          entry.Dj = true;
+        }
       } else {
         entry.Vj = reg[inst.rs1];
       }
       if (reg.b[inst.rs2]) {
-        entry.Qk = reg.q[inst.rs2];
-        entry.Dk = true;
+        if (rob.list[reg.q[inst.rs2]].done) {
+          entry.Vk = rob.list[reg.q[inst.rs2]].value;
+        } else if (rs.alu->ready && reg.q[inst.rs2] == rs.alu->rob_id) {
+          entry.Vk = rs.alu->value;
+        } else if (lsb.mu->ready && reg.q[inst.rs2] == lsb.mu->rob_id) {
+          entry.Vk = lsb.mu->value;
+        } else {
+          entry.Qk = reg.q[inst.rs2];
+          entry.Dk = true;
+        }
       } else {
         entry.Vk = reg[inst.rs2];
       }
@@ -309,14 +332,22 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     case andi: {
       if (rs.full()) {
         ready_next = false;
-        iu.reset();
+        iu.revert();
         return;
       }
       u_int32_t rob_id = rob.load(RoBEntry{toreg, inst, false, inst.rd, 0});
       RSEntry entry{true, inst.inst, 0, inst.imm, 0, 0, rob_id, false, false};
       if (reg.b[inst.rs1]) {
-        entry.Qj = reg.q[inst.rs1];
-        entry.Dj = true;
+        if (rob.list[reg.q[inst.rs1]].done) {
+          entry.Vj = rob.list[reg.q[inst.rs1]].value;
+        } else if (rs.alu->ready && reg.q[inst.rs1] == rs.alu->rob_id) {
+          entry.Vj = rs.alu->value;
+        } else if (lsb.mu->ready && reg.q[inst.rs1] == lsb.mu->rob_id) {
+          entry.Vj = lsb.mu->value;
+        } else {
+          entry.Qj = reg.q[inst.rs1];
+          entry.Dj = true;
+        }
       } else {
         entry.Vj = reg[inst.rs1];
       }
@@ -330,14 +361,22 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     case lhu: {
       if (lsb.full()) {
         ready_next = false;
-        iu.reset();
+        iu.revert();
         return;
       }
       u_int32_t rob_id = rob.load(RoBEntry{toreg, inst, false, inst.rd, 0});
       LSBEntry entry{true, inst.inst, 0, 0, 0, 0, rob_id, inst.imm, false, false};
       if (reg.b[inst.rs1]) {
-        entry.Qj = reg.q[inst.rs1];
-        entry.Dj = true;
+        if (rob.list[reg.q[inst.rs1]].done) {
+          entry.Vj = rob.list[reg.q[inst.rs1]].value;
+        } else if (rs.alu->ready && reg.q[inst.rs1] == rs.alu->rob_id) {
+          entry.Vj = rs.alu->value;
+        } else if (lsb.mu->ready && reg.q[inst.rs1] == lsb.mu->rob_id) {
+          entry.Vj = lsb.mu->value;
+        } else {
+          entry.Qj = reg.q[inst.rs1];
+          entry.Dj = true;
+        }
       } else {
         entry.Vj = reg[inst.rs1];
       }
@@ -349,20 +388,36 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     case sw: {
       if (lsb.full()) {
         ready_next = false;
-        iu.reset();
+        iu.revert();
         return;
       }
       u_int32_t rob_id = rob.load(RoBEntry{tonone, inst, false, inst.rd, 0});
       LSBEntry entry{true, inst.inst, 0, 0, 0, 0, rob_id, inst.imm, false, false};
       if (reg.b[inst.rs1]) {
-        entry.Qj = reg.q[inst.rs1];
-        entry.Dj = true;
+        if (rob.list[reg.q[inst.rs1]].done) {
+          entry.Vj = rob.list[reg.q[inst.rs1]].value;
+        } else if (rs.alu->ready && reg.q[inst.rs1] == rs.alu->rob_id) {
+          entry.Vj = rs.alu->value;
+        } else if (lsb.mu->ready && reg.q[inst.rs1] == lsb.mu->rob_id) {
+          entry.Vj = lsb.mu->value;
+        } else {
+          entry.Qj = reg.q[inst.rs1];
+          entry.Dj = true;
+        }
       } else {
         entry.Vj = reg[inst.rs1];
       }
       if (reg.b[inst.rs2]) {
-        entry.Qk = reg.q[inst.rs2];
-        entry.Dk = true;
+        if (rob.list[reg.q[inst.rs2]].done) {
+          entry.Vk = rob.list[reg.q[inst.rs2]].value;
+        } else if (rs.alu->ready && reg.q[inst.rs2] == rs.alu->rob_id) {
+          entry.Vk = rs.alu->value;
+        } else if (lsb.mu->ready && reg.q[inst.rs2] == lsb.mu->rob_id) {
+          entry.Vk = lsb.mu->value;
+        } else {
+          entry.Qk = reg.q[inst.rs2];
+          entry.Dk = true;
+        }
       } else {
         entry.Vk = reg[inst.rs2];
       }
@@ -389,14 +444,30 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
       }
       RSEntry entry{true, inst.inst, 0, 0, 0, 0, rob_id, false, false};
       if (reg.b[inst.rs1]) {
-        entry.Qj = reg.q[inst.rs1];
-        entry.Dj = true;
+        if (rob.list[reg.q[inst.rs1]].done) {
+          entry.Vj = rob.list[reg.q[inst.rs1]].value;
+        } else if (rs.alu->ready && reg.q[inst.rs1] == rs.alu->rob_id) {
+          entry.Vj = rs.alu->value;
+        } else if (lsb.mu->ready && reg.q[inst.rs1] == lsb.mu->rob_id) {
+          entry.Vj = lsb.mu->value;
+        } else {
+          entry.Qj = reg.q[inst.rs1];
+          entry.Dj = true;
+        }
       } else {
         entry.Vj = reg[inst.rs1];
       }
       if (reg.b[inst.rs2]) {
-        entry.Qk = reg.q[inst.rs2];
-        entry.Dk = true;
+        if (rob.list[reg.q[inst.rs2]].done) {
+          entry.Vk = rob.list[reg.q[inst.rs2]].value;
+        } else if (rs.alu->ready && reg.q[inst.rs2] == rs.alu->rob_id) {
+          entry.Vk = rs.alu->value;
+        } else if (lsb.mu->ready && reg.q[inst.rs2] == lsb.mu->rob_id) {
+          entry.Vk = lsb.mu->value;
+        } else {
+          entry.Qk = reg.q[inst.rs2];
+          entry.Dk = true;
+        }
       } else {
         entry.Vk = reg[inst.rs2];
       }
@@ -413,7 +484,7 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     case jalr: {
       if (reg.b[inst.rs1]) {
         ready_next = false;
-        iu.reset();
+        iu.revert();
         return;
       }
       rob.load({toreg, inst, true, inst.rd, iu.PC + 4, iu.PC, 0});
@@ -423,11 +494,15 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     }
 
     case lui: {
-      rob.load({toreg,inst,true,inst.rd,inst.imm<<12});
+      rob.load({toreg, inst, true, inst.rd, inst.imm << 12});
       break;
     }
     case auipc: {
-      rob.load({toreg,inst,true,inst.rd,iu.PC+inst.imm<<12});
+      rob.load({toreg, inst, true, inst.rd, iu.PC + inst.imm << 12});
+      break;
+    }
+    case exit: {
+      rob.load({toexit, inst, true, 0, 0});
       break;
     }
     default:

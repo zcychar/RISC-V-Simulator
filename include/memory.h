@@ -38,6 +38,9 @@ namespace sjtu {
 
   class MU {
   public:
+    MU() {
+      ready_next=true;
+    }
     void evaluate(memory &mem, RoB &rob);
 
     void load(u_int32_t addr, u_int32_t rob_id,u_int32_t value, INST inst);

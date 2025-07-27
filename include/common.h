@@ -46,6 +46,7 @@ enum INST {
   auipc,
   lui,
   null,
+  exit,
 };
 
 struct DecodedInst {
