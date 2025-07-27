@@ -6,15 +6,11 @@
 
 void sjtu::IU::evaluate(RoB &rob, Decoder &decoder, memory &mem) {
   if (revert_cond_) {
-    ready_next = true;
     return;
   }
   if (!rob.reset) {
-    if (!decoder.ready) {
-      ready_next = true;
-      return;
-    }
     if (stall) {
+      std::cerr<<"IU:Stalled\n";
       ready_next = false;
       stall_next = false;
       return;
@@ -28,9 +24,13 @@ void sjtu::IU::evaluate(RoB &rob, Decoder &decoder, memory &mem) {
   } else {
     PC_next = PC + 4;
   }
+
   u_int32_t raw_inst = mem.load_word(PC_next);
+  std::cerr<<std::hex<<"IU:reads at PC:"<<PC_next<<" raw_inst:"<<raw_inst<<std::endl;
   inst_next = decoder.decode(raw_inst);
   if (inst_next.inst == jal || inst_next.inst == jalr) {
+    std::cerr<<"IU:sets stall in next cycle\n";
     stall_next = true;
+
   }
 };

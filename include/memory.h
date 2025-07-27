@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <istream>
+#include <unordered_map>
 
 #include "common.h"
 
@@ -31,16 +32,14 @@ namespace sjtu {
     void store_word(u_int32_t addr, u_int32_t val);
 
   private:
-    std::array<unsigned char, 128 * PAGE_SIZE> pages = {};
+    std::pmr::unordered_map<u_int32_t,std::array<unsigned char, PAGE_SIZE>> pages = {};
   };
 
   class RoB;
 
   class MU {
   public:
-    MU() {
-      ready_next=true;
-    }
+
     void evaluate(memory &mem, RoB &rob);
 
     void load(u_int32_t addr, u_int32_t rob_id,u_int32_t value, INST inst);
@@ -52,7 +51,6 @@ namespace sjtu {
       type = type_next;
       rob_id = rob_id_next;
       ready = ready_next;
-      ready_next=false;
     };
 
     u_int32_t remain = 0;

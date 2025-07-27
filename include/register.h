@@ -1,4 +1,7 @@
 #pragma once
+#include "RoB.h"
+#include <sys/types.h>
+#include <array>
 
 namespace sjtu {
 
@@ -32,8 +35,6 @@ class REG {
     r = r_next;
     b = b_next;
     q = q_next;
-    q_next.fill(0);
-    b_next.fill(false);
   }
 
   std::array<u_int32_t, 32> r{};

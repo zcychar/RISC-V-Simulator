@@ -24,7 +24,7 @@ class Predictor;
 
 class Decoder {
  public:
- Decoder():ready_next(true){}
+  Decoder() : set_pc(true) {}
   DecodedInst decode(int32_t x);
 
   void evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predictor &predictor);
@@ -33,11 +33,9 @@ class Decoder {
 
   bool set_pc = false;
   u_int32_t pc = 0;
-  bool ready = false;
 
  private:
   bool set_pc_next = false;
   u_int32_t pc_next = 0;
-  bool ready_next = false;
 };
 }  // namespace sjtu

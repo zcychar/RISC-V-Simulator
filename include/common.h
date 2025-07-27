@@ -3,11 +3,12 @@
 
 #include <array>
 #include <stdexcept>
+#include <iostream>
 
 namespace sjtu {
 
-
 enum INST {
+  null,
   add,
   sub,
   and_,
@@ -45,7 +46,7 @@ enum INST {
   jalr,
   auipc,
   lui,
-  null,
+
   exit,
 };
 
@@ -80,15 +81,20 @@ struct List {
     first = (first + 1) % list.size();
     --size;
   }
+  void clear() {
+    for(int i=0;i<16;++i)list[i]=T();
+    size=first=last=0;
+  }
 
   int push(const T &val) {
     if (full()) {
       return -1;
     }
     list[last] = val;
+    int tmp=last;
     last = (last + 1) % list.size();
     ++size;
-    return last;
+    return tmp;
   }
 
   std::array<T, 16> list{};

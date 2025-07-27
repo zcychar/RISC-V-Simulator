@@ -7,13 +7,20 @@
 #include <memory.h>
 #include <register.h>
 
-void sjtu::RoB::evaluate(REG &reg, RS &rs, LSB &lsb, Predictor &predictor) {
+
+int sjtu::RoB::load(RoBEntry entry) {
+  int tmp = list_next.push(entry);
+  reg->set_busy(entry.dest,tmp);
+  std::cerr << "rob loaded at:" << tmp <<" control reg:"<<entry.dest<< std::endl;
+  return tmp;
+}
+
+
+void sjtu::RoB::evaluate( RS &rs, LSB &lsb, Predictor &predictor) {
   if (reset) {
     reset_next = false;
     pc_next = false;
-    for (int i = 0; i < 16; ++i) {
-      list_next[i] = {};
-    }
+    list_next.clear();
     return;
   }
   reset_next = false;
@@ -29,23 +36,26 @@ void sjtu::RoB::evaluate(REG &reg, RS &rs, LSB &lsb, Predictor &predictor) {
     list_next.pop();
     switch (list[list.first].type) {
       case toreg: {
-        reg.set_val(list[list.first].dest, list[list.first].value);
+        std::cerr<<"ROB: commit at:"<<list.first<<" clear reg:"<<list[list.first].dest<<"\n";
+        reg->set_val(list[list.first].dest, list[list.first].value);
         break;
       }
       case toaddr: {
         if (list[list.first].value == (list[list.first].alt_addr != list[list.first].addr + 4)) {
+          std::cerr<<"ROB: commit at:"<<list.first<<" wrong prediction change to:"<<list[list.first].alt_addr<<std::endl;
           pc_next = list[list.first].alt_addr;
           reset_next = true;
           predictor.is_wrong(list[list.first].addr);
         } else {
+          std::cerr<<"ROB: commit at:"<<list.first<<" right prediction \n";
           predictor.is_right(list[list.first].addr);
         }
         break;
       }
       case toexit: {
-        throw reg[10]&0xFF;
+        throw reg->r[10]&0xFF;
       }
-      default:
+      default:std::cerr<<"ROB: commit at:"<<list.first<<"other instruction \n";
         break;
     }
   }

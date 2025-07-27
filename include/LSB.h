@@ -38,12 +38,9 @@ class LSB {
   }
 
   void load(LSBEntry x) {
-    for (int i = 0; i < 16; ++i) {
-      if (list_next[i].busy == false) {
-        list_next[i] = x;
-        return;
-      }
-    }
+    int tmp=list_next.push(x);
+    std::cerr << "LSB:load rob_id:" << x.dest << " into slot:" << tmp<< std::endl;
+    return;
     throw std::runtime_error("Trying to add into a full list!");
   }
 

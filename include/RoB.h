@@ -1,4 +1,7 @@
 #pragma once
+
+#include <iostream>
+
 #include "common.h"
 
 /**
@@ -22,7 +25,7 @@ class RS;
 class LSB;
 class Predictor;
 
-enum RoBType { toreg, toaddr, tonone,toexit };
+enum RoBType { toreg, toaddr, tonone, toexit };
 
 struct RoBEntry {
   RoBType type;
@@ -36,11 +39,14 @@ struct RoBEntry {
 
 class RoB {
  public:
+  RoB(REG* reg):reg(reg){}
+
   bool full() { return list.full(); }
 
-  int load(RoBEntry entry) { return list_next.push(entry); }
+  int load(RoBEntry entry);
 
-  void evaluate(REG &reg, RS &rs, LSB &lsb, Predictor &predictor);
+
+  void evaluate( RS &rs, LSB &lsb, Predictor &predictor);
 
   void update() {
     list = list_next;
@@ -51,6 +57,7 @@ class RoB {
   List<RoBEntry> list{};
   bool reset = false;
   u_int32_t pc = 0;
+  REG* reg;
 
  private:
   List<RoBEntry> list_next{};

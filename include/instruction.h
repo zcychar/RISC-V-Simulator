@@ -21,11 +21,12 @@ class memory;
 
 class IU {
  public:
-  IU():ready_next(true){}
+  IU():ready(false){}
 
   void evaluate(RoB &rob, Decoder &decoder, memory &mem);
 
   void revert() {
+    std::cerr<<"IU is called to revert this cycle\n";
     PC_next = PC;
     inst_next = inst;
     stall_next = stall;
