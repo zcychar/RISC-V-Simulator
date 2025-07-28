@@ -37,7 +37,7 @@ void sjtu::RoB::evaluate( RS &rs, LSB &lsb, Predictor &predictor) {
     switch (list[list.first].type) {
       case toreg: {
         std::cerr<<"ROB: commit at:"<<list.first<<" clear reg:"<<list[list.first].dest<<"\n";
-        reg->set_val(list[list.first].dest, list[list.first].value);
+        reg->set_val(list[list.first].dest, list[list.first].value,list.first);
         break;
       }
       case toaddr: {

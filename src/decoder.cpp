@@ -1,14 +1,13 @@
 #include "decoder.h"
 
-#include <ALU.h>
-#include <memory.h>
-
 #include <mutex>
 
+#include "ALU.h"
 #include "LSB.h"
 #include "RS.h"
 #include "RoB.h"
 #include "instruction.h"
+#include "memory.h"
 #include "register.h"
 
 sjtu::DecodedInst sjtu::Decoder::decode(int32_t x) {
@@ -74,7 +73,7 @@ sjtu::DecodedInst sjtu::Decoder::decode(int32_t x) {
     case 0b0010011: {
       u_int32_t funct3 = (x >> 12) & 0x7;
       inst.rd = (x >> 7) & 0x1F;
-      inst.rs1 = (x >> 15) & 0x7;
+      inst.rs1 = (x >> 15) & 0x1F;
       switch (funct3) {
         case 0b000: {
           inst.inst = addi;
@@ -131,7 +130,7 @@ sjtu::DecodedInst sjtu::Decoder::decode(int32_t x) {
     case 0b0000011: {
       u_int32_t funct3 = (x >> 12) & 0x7;
       inst.rd = (x >> 7) & 0x1F;
-      inst.rs1 = (x >> 15) & 0x7;
+      inst.rs1 = (x >> 15) & 0x1F;
       inst.imm = x >> 20;
       switch (funct3) {
         case 0b000: {
@@ -185,7 +184,7 @@ sjtu::DecodedInst sjtu::Decoder::decode(int32_t x) {
     case 0b1100011: {
       inst.rs1 = (x >> 15) & 0x1F;
       inst.rs2 = (x >> 20) & 0x1F;
-      u_int32_t imm12 = (x >> 31) ;
+      u_int32_t imm12 = (x >> 31);
       u_int32_t imm10_5 = (x >> 25) & 0x3F;
       u_int32_t imm4_1 = (x >> 8) & 0xF;
       u_int32_t imm11 = (x >> 7) & 0x1;
@@ -336,16 +335,22 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
       }
       u_int32_t rob_id = rob.load(RoBEntry{toreg, inst, false, inst.rd, 0, iu.PC});
       RSEntry entry{true, inst.inst, 0, inst.imm, 0, 0, rob_id, false, false};
+      std::cerr << "Decoder:rs1:" << inst.rs1 << std::endl;
       if (reg.b[inst.rs1]) {
+        std::cerr << "Decoder: check special dependence:";
         if (rob.list[reg.q[inst.rs1]].done) {
+          std::cerr << " rob done\n";
           entry.Vj = rob.list[reg.q[inst.rs1]].value;
         } else if (rs.alu->ready && reg.q[inst.rs1] == rs.alu->rob_id) {
+          std::cerr << " alu done\n";
           entry.Vj = rs.alu->value;
         } else if (lsb.mu->ready && reg.q[inst.rs1] == lsb.mu->rob_id) {
+          std::cerr << " mu done\n";
           entry.Vj = lsb.mu->value;
         } else {
           entry.Qj = reg.q[inst.rs1];
           entry.Dj = true;
+          std::cerr << " no excuse set:" << entry.Qj << std::endl;
         }
       } else {
         entry.Vj = reg[inst.rs1];
@@ -499,11 +504,11 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     }
 
     case lui: {
-      rob.load({toreg, inst, true, inst.rd, inst.imm << 12, iu.PC});
+      rob.load({toreg, inst, true, inst.rd, inst.imm, iu.PC});
       break;
     }
     case auipc: {
-      rob.load({toreg, inst, true, inst.rd, iu.PC + inst.imm << 12, iu.PC});
+      rob.load({toreg, inst, true, inst.rd, iu.PC + inst.imm, iu.PC});
       break;
     }
     case exit: {
