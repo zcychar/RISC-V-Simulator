@@ -1,8 +1,8 @@
-#include "instruction.h"
+#include "../include/instruction.h"
 
-#include "RoB.h"
-#include "decoder.h"
-#include "memory.h"
+#include "../include/RoB.h"
+#include "../include/decoder.h"
+#include "../include/memory.h"
 
 void sjtu::IU::evaluate(RoB &rob, Decoder &decoder, memory &mem) {
   if (revert_cond_) {

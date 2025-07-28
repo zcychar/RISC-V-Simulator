@@ -1,6 +1,5 @@
 #pragma once
 #include <sys/types.h>
-
 #include <array>
 #include <iostream>
 #include <stdexcept>

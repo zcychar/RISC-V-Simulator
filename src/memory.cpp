@@ -1,9 +1,9 @@
-#include "memory.h"
-
-#include <RoB.h>
+#include "../include/memory.h"
 
 #include <iostream>
 #include <sstream>
+
+#include "../include/RoB.h"
 
 void sjtu::memory::init(std::istream &in) {
   std::string str;

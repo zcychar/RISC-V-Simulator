@@ -1,8 +1,9 @@
-#include "LSB.h"
+#include "../include/LSB.h"
 
-#include <ALU.h>
-#include <RS.h>
-#include <memory.h>
+#include "../include/ALU.h"
+#include "../include/RS.h"
+#include "../include/RoB.h"
+#include "../include/memory.h"
 
 void sjtu::LSB::evaluate(RS &rs, RoB &rob) {
   if (rob.reset) {

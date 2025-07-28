@@ -1,11 +1,13 @@
-#include "RoB.h"
+#include "../include/RoB.h"
 
-#include <ALU.h>
-#include <LSB.h>
-#include <RS.h>
 #include <bits/types/siginfo_t.h>
-#include <memory.h>
-#include <register.h>
+
+#include "../include/ALU.h"
+#include "../include/LSB.h"
+#include "../include/RS.h"
+#include "../include/memory.h"
+#include "../include/register.h"
+
 
 int sjtu::RoB::load(RoBEntry entry) {
   int tmp = list_next.push(entry);

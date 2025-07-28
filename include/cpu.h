@@ -1,12 +1,12 @@
 #pragma once
-#include <ALU.h>
-#include <LSB.h>
-#include <RS.h>
-#include <RoB.h>
-#include <decoder.h>
-#include <instruction.h>
-#include <memory.h>
-#include <register.h>
+#include "ALU.h"
+#include "LSB.h"
+#include "RS.h"
+#include "RoB.h"
+#include "decoder.h"
+#include "instruction.h"
+#include "memory.h"
+#include "register.h"
 
 namespace sjtu {
 class CPU {
@@ -37,6 +37,7 @@ class CPU {
       }
     } catch (u_int32_t num) {
       std::cout << num << std::endl;
+      std::cerr << clk <<std::endl;
     } catch (std::runtime_error &err) {
       std::cerr << err.what();
     }

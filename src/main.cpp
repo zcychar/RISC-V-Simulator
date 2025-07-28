@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "cpu.h"
+#include "../include/cpu.h"
 
 int main() {
   sjtu::CPU cpu;

@@ -1,14 +1,14 @@
-#include "decoder.h"
+#include "../include/decoder.h"
 
 #include <mutex>
 
-#include "ALU.h"
-#include "LSB.h"
-#include "RS.h"
-#include "RoB.h"
-#include "instruction.h"
-#include "memory.h"
-#include "register.h"
+#include "../include/ALU.h"
+#include "../include/LSB.h"
+#include "../include/RS.h"
+#include "../include/RoB.h"
+#include "../include/instruction.h"
+#include "../include/memory.h"
+#include "../include/register.h"
 
 sjtu::DecodedInst sjtu::Decoder::decode(int32_t x) {
   if (static_cast<u_int32_t>(x) == 0x0ff00513) {
