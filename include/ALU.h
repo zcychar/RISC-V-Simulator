@@ -39,13 +39,13 @@ class ALU {
         return in1 ^ in2;
       case slli:
       case sll:
-        return in1 << in2 & 0x1F;
+        return in1 << (in2 & 0x1F);
       case srli:
       case srl:
-        return in1 >> in2 & 0x1F;
+        return in1 >> (in2 & 0x1F);
       case srai:
       case sra:
-        return static_cast<int32_t>(in1) >> static_cast<int32_t>(in2) & 0x1F;
+        return static_cast<int32_t>(in1) >> (static_cast<int32_t>(in2) & 0x1F);
       case slti:
       case slt:
         return static_cast<int32_t>(in1) < static_cast<int32_t>(in2) ? 1 : 0;
