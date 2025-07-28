@@ -7,6 +7,7 @@
 #include "../include/RS.h"
 #include "../include/memory.h"
 #include "../include/register.h"
+#include "../include/predictor.h"
 
 
 int sjtu::RoB::load(RoBEntry entry) {

@@ -9,6 +9,7 @@
 #include "../include/instruction.h"
 #include "../include/memory.h"
 #include "../include/register.h"
+#include "../include/predictor.h"
 
 sjtu::DecodedInst sjtu::Decoder::decode(int32_t x) {
   if (static_cast<u_int32_t>(x) == 0x0ff00513) {

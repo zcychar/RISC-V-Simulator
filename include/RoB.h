@@ -62,12 +62,5 @@ class RoB {
   u_int32_t pc_next = 0;
 };
 
-class Predictor {
- public:
-  bool predict(u_int32_t x) { return true; }
 
-  void is_right(u_int32_t x) { return; }
-
-  void is_wrong(u_int32_t x) { return; }
-};
 }  // namespace sjtu

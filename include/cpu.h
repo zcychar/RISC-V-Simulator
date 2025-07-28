@@ -1,4 +1,10 @@
 #pragma once
+#include <algorithm>
+#include <array>
+#include <functional>
+#include <random>
+#include <vector>
+
 #include "ALU.h"
 #include "LSB.h"
 #include "RS.h"
@@ -6,6 +12,7 @@
 #include "decoder.h"
 #include "instruction.h"
 #include "memory.h"
+#include "predictor.h"
 #include "register.h"
 
 namespace sjtu {
@@ -22,6 +29,7 @@ class CPU {
     decoder = new Decoder;
     predictor = new Predictor;
     rob = new RoB(reg);
+    g.seed(rd());
   }
 
   void init_input(std::istream &in) { mem->init(in); }
@@ -37,7 +45,8 @@ class CPU {
       }
     } catch (u_int32_t num) {
       std::cout << num << std::endl;
-      std::cerr << clk <<std::endl;
+      std::cerr << "clock: " << clk << std::endl;
+      std::cerr << "decision made: " << predictor->total_count << " right: " << predictor->right_count << std::endl;
     } catch (std::runtime_error &err) {
       std::cerr << err.what();
     }
@@ -45,14 +54,18 @@ class CPU {
 
   void evaluate() {
     // debug_printer();
-    alu->evaluate();
-    mu->evaluate(*mem, *rob);
-    rs->evaluate(*rob, *lsb);
-    lsb->evaluate(*rs, *rob);
-    decoder->evaluate(*rs, *lsb, *iu, *rob, *reg, *predictor);
-    iu->evaluate(*rob, *decoder, *mem);
-    reg->evaluate(*rob);
-    rob->evaluate(*rs, *lsb, *predictor);
+
+    auto funcs =
+        std::vector<std::function<void()>>{[this]() { alu->evaluate(); },
+                                           [this]() { mu->evaluate(*mem, *rob); },
+                                           [this]() { rs->evaluate(*rob, *lsb); },
+                                           [this]() { lsb->evaluate(*rs, *rob); },
+                                           [this]() { decoder->evaluate(*rs, *lsb, *iu, *rob, *reg, *predictor); },
+                                           [this]() { iu->evaluate(*rob, *decoder, *mem); },
+                                           [this]() { reg->evaluate(*rob); },
+                                           [this]() { rob->evaluate(*rs, *lsb, *predictor); }};
+    std::shuffle(funcs.begin(), funcs.end(), g);
+    for (auto &f : funcs) f();
   }
 
   void debug_printer() {
@@ -74,14 +87,12 @@ class CPU {
   }
 
   void update() {
-    alu->update();
-    mu->update();
-    rs->update();
-    lsb->update();
-    decoder->update();
-    iu->update();
-    reg->update();
-    rob->update();
+    auto funcs = std::vector<std::function<void()>>{[this]() { alu->update(); },     [this]() { mu->update(); },
+                                                    [this]() { rs->update(); },      [this]() { lsb->update(); },
+                                                    [this]() { decoder->update(); }, [this]() { iu->update(); },
+                                                    [this]() { reg->update(); },     [this]() { rob->update(); }};
+    std::shuffle(funcs.begin(), funcs.end(), g);
+    for (auto &f : funcs) f();
   }
 
  private:
@@ -95,5 +106,8 @@ class CPU {
   REG *reg;
   Decoder *decoder;
   Predictor *predictor;
+
+  std::random_device rd;
+  std::mt19937 g;
 };
 }  // namespace sjtu
