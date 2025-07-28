@@ -36,18 +36,18 @@ void sjtu::RoB::evaluate( RS &rs, LSB &lsb, Predictor &predictor) {
     list_next.pop();
     switch (list[list.first].type) {
       case toreg: {
-        std::cerr<<"ROB: commit at:"<<list.first<<" clear reg:"<<list[list.first].dest<<"\n";
+        std::cerr<<"ROB: commit addr:"<<list[list.first].addr<<" clear reg:"<<list[list.first].dest<<"\n";
         reg->set_val(list[list.first].dest, list[list.first].value,list.first);
         break;
       }
       case toaddr: {
         if (list[list.first].value == (list[list.first].alt_addr != list[list.first].addr + 4)) {
-          std::cerr<<"ROB: commit at:"<<list.first<<" wrong prediction change to:"<<list[list.first].alt_addr<<std::endl;
+          std::cerr<<"ROB: commit addr:"<<list[list.first].addr<<" wrong prediction change to:"<<list[list.first].alt_addr<<std::endl;
           pc_next = list[list.first].alt_addr;
           reset_next = true;
           predictor.is_wrong(list[list.first].addr);
         } else {
-          std::cerr<<"ROB: commit at:"<<list.first<<" right prediction \n";
+          std::cerr<<"ROB: commit addr:"<<list[list.first].addr<<" right prediction \n";
           predictor.is_right(list[list.first].addr);
         }
         break;
@@ -55,7 +55,7 @@ void sjtu::RoB::evaluate( RS &rs, LSB &lsb, Predictor &predictor) {
       case toexit: {
         throw reg->r[10]&0xFF;
       }
-      default:std::cerr<<"ROB: commit at:"<<list.first<<"other instruction \n";
+      default:std::cerr<<"ROB: commit addr:"<<list[list.first].addr<<" other instruction \n";
         break;
     }
   }

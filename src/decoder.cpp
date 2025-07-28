@@ -439,6 +439,7 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     case bgeu: {
       if (rs.full()) {
         std::cerr << "Decoder:rs full\n";
+        iu.revert();
         return;
       }
       u_int32_t rob_id;
@@ -449,6 +450,7 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
         rob_id = rob.load({toaddr, inst, false, 0, 0, iu.PC, iu.PC + inst.imm});
         pc_next = iu.PC + 4;
       }
+      set_pc_next=true;
       RSEntry entry{true, inst.inst, 0, 0, 0, 0, rob_id, false, false};
       if (reg.b[inst.rs1]) {
         if (rob.list[reg.q[inst.rs1]].done) {
