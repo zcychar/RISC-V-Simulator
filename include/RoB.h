@@ -37,14 +37,13 @@ struct RoBEntry {
 
 class RoB {
  public:
-  RoB(REG* reg):reg(reg){}
+  RoB(REG *reg) : reg(reg) {}
 
   bool full() { return list.full(); }
 
   int load(RoBEntry entry);
 
-
-  void evaluate( RS &rs, LSB &lsb, Predictor &predictor);
+  void evaluate(RS &rs, LSB &lsb, Predictor &predictor);
 
   void update() {
     list = list_next;
@@ -55,7 +54,7 @@ class RoB {
   List<RoBEntry> list{};
   bool reset = false;
   u_int32_t pc = 0;
-  REG* reg;
+  REG *reg;
 
  private:
   List<RoBEntry> list_next{};

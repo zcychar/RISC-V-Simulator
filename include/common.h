@@ -2,8 +2,8 @@
 #include <sys/types.h>
 
 #include <array>
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
 
 namespace sjtu {
 
@@ -82,8 +82,8 @@ struct List {
     --size;
   }
   void clear() {
-    for(int i=0;i<16;++i)list[i]=T();
-    size=first=last=0;
+    for (int i = 0; i < 16; ++i) list[i] = T();
+    size = first = last = 0;
   }
 
   int push(const T &val) {
@@ -91,7 +91,7 @@ struct List {
       return -1;
     }
     list[last] = val;
-    int tmp=last;
+    int tmp = last;
     last = (last + 1) % list.size();
     ++size;
     return tmp;

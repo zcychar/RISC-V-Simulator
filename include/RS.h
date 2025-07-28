@@ -36,7 +36,7 @@ class RS {
     for (int i = 0; i < 16; ++i) {
       if (list_next[i].busy == false) {
         list_next[i] = x;
-        std::cerr<<"RS: load instruction dependence j:"<<x.Dj<<","<<x.Qj<<" k:"<<x.Dk<<","<<x.Qk<<std::endl;
+        // std::cerr<<"RS: load instruction dependence j:"<<x.Dj<<","<<x.Qj<<" k:"<<x.Dk<<","<<x.Qk<<std::endl;
         return;
       }
     }

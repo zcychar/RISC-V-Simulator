@@ -31,7 +31,7 @@ class CPU {
     try {
       while (true) {
         ++clk;
-        std::cerr<<std::endl<<"clock:"<<clk<<std::endl;
+        // std::cerr<<std::endl<<"clock:"<<clk<<std::endl;
         evaluate();
         update();
       }
@@ -43,7 +43,7 @@ class CPU {
   }
 
   void evaluate() {
-    debug_printer();
+    // debug_printer();
     alu->evaluate();
     mu->evaluate(*mem, *rob);
     rs->evaluate(*rob, *lsb);
@@ -52,25 +52,24 @@ class CPU {
     iu->evaluate(*rob, *decoder, *mem);
     reg->evaluate(*rob);
     rob->evaluate(*rs, *lsb, *predictor);
-
   }
 
   void debug_printer() {
     std::cerr << "IU ready:" << iu->ready << " PC:" << iu->PC << std::endl;
-    std::cerr <<"rob size:"<<rob->list.size<<std::endl;
-    for(int j=0,i=rob->list.first;j<rob->list.size;++j,i=(i+1)%16) {
-      std::cerr<<"  rob_id:"<<i<<" done:"<<rob->list[i].done<<" addr:"<<rob->list[i].addr<<std::endl;
+    std::cerr << "rob size:" << rob->list.size << std::endl;
+    for (int j = 0, i = rob->list.first; j < rob->list.size; ++j, i = (i + 1) % 16) {
+      std::cerr << "  rob_id:" << i << " done:" << rob->list[i].done << " addr:" << rob->list[i].addr << std::endl;
     }
 
-    std::cerr << "alu ready:" << alu->ready << " rob_id:" << alu->rob_id <<" value:"<<alu->value<< std::endl;
-    std::cerr << "mu ready:" << mu->ready << " rob_id:" << mu->rob_id <<" value:"<<mu->value<< std::endl;
-    for(int i=0;i<32;++i) {
-        std::cerr<<i<<":r:"<<reg->r[i]<<" b:"<<reg->b[i]<<" q:"<<reg->q[i]<<"\t";
-      if((i+1)%8==0) {
-        std::cerr<<std::endl;
+    std::cerr << "alu ready:" << alu->ready << " rob_id:" << alu->rob_id << " value:" << alu->value << std::endl;
+    std::cerr << "mu ready:" << mu->ready << " rob_id:" << mu->rob_id << " value:" << mu->value << std::endl;
+    for (int i = 0; i < 32; ++i) {
+      std::cerr << i << ":r:" << reg->r[i] << " b:" << reg->b[i] << " q:" << reg->q[i] << "\t";
+      if ((i + 1) % 8 == 0) {
+        std::cerr << std::endl;
       }
     }
-    std::cerr<<std::endl;
+    std::cerr << std::endl;
   }
 
   void update() {

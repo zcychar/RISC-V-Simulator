@@ -34,12 +34,12 @@ void sjtu::LSB::evaluate(RS &rs, RoB &rob) {
       }
     }
   }
-  if (mu->remain==0 && !list.empty()) {
+  if (mu->remain == 0 && !list.empty()) {
     int index = list.first;
     if (list[index].busy && !list_next[index].Dj && !list_next[index].Dk) {
-      std::cerr<<"LSB:send robid:"<<list[index].dest<<" to mu calculate\n";
-      mu->load(static_cast<int32_t>(list_next[index].Vj + list_next[index].imm), list_next[index].dest, list_next[index].Vk,
-               list_next[index].inst);
+      ////std::cerr<<"LSB:send robid:"<<list[index].dest<<" to mu calculate\n";
+      mu->load(static_cast<int32_t>(list_next[index].Vj + list_next[index].imm), list_next[index].dest,
+               list_next[index].Vk, list_next[index].inst);
       list_next[index].busy = false;
       list_next.pop();
     }

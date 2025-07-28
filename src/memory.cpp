@@ -53,12 +53,12 @@ void sjtu::memory::store_half(u_int32_t addr, unsigned short val) {
 }
 
 void sjtu::memory::store_word(u_int32_t addr, u_int32_t val) {
-  std::cerr << "store word :" << val << " into :" << addr << std::endl;
+  // std::cerr << "store word :" << val << " into :" << addr << std::endl;
   *reinterpret_cast<u_int32_t *>(pages[addr / PAGE_SIZE].data() + addr % PAGE_SIZE) = val;
 }
 
 void sjtu::MU::load(u_int32_t addr, u_int32_t rob_id, u_int32_t value, INST inst) {
-  std::cerr << "MU: load an instruction at robid:" << rob_id << " \n";
+  // std::cerr << "MU: load an instruction at robid:" << rob_id << " \n";
   remain_next = 3;
   addr_next = addr;
   rob_id_next = rob_id;
@@ -81,7 +81,7 @@ void sjtu::MU::evaluate(memory &mem, RoB &rob) {
   if (remain > 0) {
     remain_next = remain - 1;
     if (remain_next == 0 && type != null) {
-      std::cerr << "MU:instruction at " << rob_id << " is completed, value\n";
+      // std::cerr << "MU:instruction at " << rob_id << " is completed, value\n";
       ready_next = true;
       switch (type) {
         case lb: {

@@ -260,11 +260,11 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     return;
   }
   if (!iu.ready) {
-    std::cerr << "Decoder:IU not ready\n";
+    // std::cerr << "Decoder:IU not ready\n";
     return;
   }
   if (rob.full()) {
-    std::cerr << "Decoder:rob full\n";
+    // std::cerr << "Decoder:rob full\n";
     iu.revert();
     return;
   }
@@ -281,7 +281,7 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     case or_:
     case and_: {
       if (rs.full()) {
-        std::cerr << "Decoder:rs full\n";
+        // std::cerr << "Decoder:rs full\n";
         iu.revert();
         return;
       }
@@ -315,7 +315,7 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
       } else {
         entry.Vk = reg[inst.rs2];
       }
-      std::cerr << "Decoder:load into rs and rob\n";
+      // std::cerr << "Decoder:load into rs and rob\n";
       rs.load(entry);
       return;
     }
@@ -329,33 +329,33 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     case ori:
     case andi: {
       if (rs.full()) {
-        std::cerr << "Decoder:rs full\n";
+        // std::cerr << "Decoder:rs full\n";
         iu.revert();
         return;
       }
       u_int32_t rob_id = rob.load(RoBEntry{toreg, inst, false, inst.rd, 0, iu.PC});
       RSEntry entry{true, inst.inst, 0, inst.imm, 0, 0, rob_id, false, false};
-      std::cerr << "Decoder:rs1:" << inst.rs1 << std::endl;
+      // std::cerr << "Decoder:rs1:" << inst.rs1 << std::endl;
       if (reg.b[inst.rs1]) {
-        std::cerr << "Decoder: check special dependence:";
+        // std::cerr << "Decoder: check special dependence:";
         if (rob.list[reg.q[inst.rs1]].done) {
-          std::cerr << " rob done\n";
+          // std::cerr << " rob done\n";
           entry.Vj = rob.list[reg.q[inst.rs1]].value;
         } else if (rs.alu->ready && reg.q[inst.rs1] == rs.alu->rob_id) {
-          std::cerr << " alu done\n";
+          // std::cerr << " alu done\n";
           entry.Vj = rs.alu->value;
         } else if (lsb.mu->ready && reg.q[inst.rs1] == lsb.mu->rob_id) {
-          std::cerr << " mu done\n";
+          // std::cerr << " mu done\n";
           entry.Vj = lsb.mu->value;
         } else {
           entry.Qj = reg.q[inst.rs1];
           entry.Dj = true;
-          std::cerr << " no excuse set:" << entry.Qj << std::endl;
+          // std::cerr << " no excuse set:" << entry.Qj << std::endl;
         }
       } else {
         entry.Vj = reg[inst.rs1];
       }
-      std::cerr << "Decoder:load into rs and rob\n";
+      // std::cerr << "Decoder:load into rs and rob\n";
       rs.load(entry);
       return;
     }
@@ -365,7 +365,7 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     case lbu:
     case lhu: {
       if (lsb.full()) {
-        std::cerr << "Decoder:lsb full\n";
+        // std::cerr << "Decoder:lsb full\n";
         iu.revert();
         return;
       }
@@ -385,7 +385,7 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
       } else {
         entry.Vj = reg[inst.rs1];
       }
-      std::cerr << "Decoder:load into lsb and rob\n";
+      // std::cerr << "Decoder:load into lsb and rob\n";
       lsb.load(entry);
       return;
     }
@@ -393,7 +393,7 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     case sh:
     case sw: {
       if (lsb.full()) {
-        std::cerr << "Decoder:lsb full\n";
+        // std::cerr << "Decoder:lsb full\n";
         iu.revert();
         return;
       }
@@ -427,7 +427,7 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
       } else {
         entry.Vk = reg[inst.rs2];
       }
-      std::cerr << "Decoder:load into lsb and rob\n";
+      // std::cerr << "Decoder:load into lsb and rob\n";
       lsb.load(entry);
       return;
     }
@@ -438,7 +438,7 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
     case bltu:
     case bgeu: {
       if (rs.full()) {
-        std::cerr << "Decoder:rs full\n";
+        // std::cerr << "Decoder:rs full\n";
         iu.revert();
         return;
       }
@@ -450,7 +450,7 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
         rob_id = rob.load({toaddr, inst, false, 0, 0, iu.PC, iu.PC + inst.imm});
         pc_next = iu.PC + 4;
       }
-      set_pc_next=true;
+      set_pc_next = true;
       RSEntry entry{true, inst.inst, 0, 0, 0, 0, rob_id, false, false};
       if (reg.b[inst.rs1]) {
         if (rob.list[reg.q[inst.rs1]].done) {
@@ -480,7 +480,7 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
       } else {
         entry.Vk = reg[inst.rs2];
       }
-      std::cerr << "Decoder:load into rs and rob\n";
+      // std::cerr << "Decoder:load into rs and rob\n";
       rs.load(entry);
       return;
     }
@@ -489,19 +489,19 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
       rob.load({toreg, inst, true, inst.rd, iu.PC + 4, iu.PC, 0});
       set_pc_next = true;
       pc_next = (iu.PC + inst.imm) & ~1;
-      std::cerr << "Decoder:met jal quick pc set:" << pc_next << std::endl;
+      // std::cerr << "Decoder:met jal quick pc set:" << pc_next << std::endl;
       return;
     }
     case jalr: {
       if (reg.b[inst.rs1]) {
-        std::cerr << "Decoder:met jalr found reg dependent\n";
+        // std::cerr << "Decoder:met jalr found reg dependent\n";
         iu.revert();
         return;
       }
       rob.load({toreg, inst, true, inst.rd, iu.PC + 4, iu.PC, 0});
       set_pc_next = true;
       pc_next = (reg.r[inst.rs1] + inst.imm) & ~1;
-      std::cerr << "Decoder:met jalr quick pc set:" << pc_next << std::endl;
+      // std::cerr << "Decoder:met jalr quick pc set:" << pc_next << std::endl;
       return;
     }
 

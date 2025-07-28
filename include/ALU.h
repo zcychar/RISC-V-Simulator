@@ -9,9 +9,8 @@ namespace sjtu {
 
 class ALU {
  public:
-
   void load(INST inst, u_int32_t in1, u_int32_t in2, u_int32_t rob_id) {
-    std::cerr<<"ALU:load rob_id:"<<rob_id<<std::endl;
+    // std::cerr<<"ALU:load rob_id:"<<rob_id<<std::endl;
     inst_next = inst;
     in1_next = in1;
     in2_next = in2;
@@ -78,7 +77,7 @@ class ALU {
     rob_id = rob_id_next;
     value = cal();
     ready_next = false;
-    inst_next=null;
+    inst_next = null;
   }
 
   bool ready = false;

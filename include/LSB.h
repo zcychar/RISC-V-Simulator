@@ -38,8 +38,8 @@ class LSB {
   }
 
   void load(LSBEntry x) {
-    int tmp=list_next.push(x);
-    std::cerr << "LSB:load rob_id:" << x.dest << " into slot:" << tmp<< std::endl;
+    int tmp = list_next.push(x);
+    // std::cerr << "LSB:load rob_id:" << x.dest << " into slot:" << tmp<< std::endl;
     return;
     throw std::runtime_error("Trying to add into a full list!");
   }
