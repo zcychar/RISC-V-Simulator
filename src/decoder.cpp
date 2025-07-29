@@ -444,7 +444,8 @@ void sjtu::Decoder::evaluate(RS &rs, LSB &lsb, IU &iu, RoB &rob, REG &reg, Predi
         return;
       }
       u_int32_t rob_id;
-      if (predictor.predict(iu.PC)) {
+      bool predict=predictor.predict(iu.PC);
+      if (predict) {
         rob_id = rob.load({toaddr, inst, false, 0, 0, iu.PC, iu.PC + 4});
         pc_next = iu.PC + inst.imm;
       } else {

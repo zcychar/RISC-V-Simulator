@@ -27,7 +27,7 @@ class CPU {
     rs = new RS(alu);
     reg = new REG;
     decoder = new Decoder;
-    predictor = new Predictor;
+    predictor = new two_bit_Predictor;
     rob = new RoB(reg);
     g.seed(rd());
   }
