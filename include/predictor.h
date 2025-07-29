@@ -2,47 +2,47 @@
 
 namespace sjtu {
 
-struct Predictor {
+class Predictor {
+public:
   virtual ~Predictor() = default;
   virtual bool predict(u_int32_t x) { return true; };
 
-  virtual void is_right(u_int32_t x) {}
+  void is_right() {
+    right_count++;
+    total_count++;
+  }
 
-  virtual void is_wrong(u_int32_t x) {}
-  u_int32_t fake_count = 0;
+  void is_wrong() { total_count++; }
+
+  virtual void is_branch(u_int32_t x) {}
+
+  virtual void not_branch(u_int32_t x) {}
+
   u_int32_t total_count = 0;
   u_int32_t right_count = 0;
 };
 
 struct Static_Predictor : Predictor {
   bool predict(u_int32_t x) override { return true; };
-  void is_right(u_int32_t x) override {
-    total_count++;
-    right_count++;
-  };
-  void is_wrong(u_int32_t x) override { total_count++; };
+  void is_branch(u_int32_t x) override{};
+  void not_branch(u_int32_t x) override{};
 };
-struct two_bit_Predictor : Predictor {
 
+struct two_bit_Predictor : Predictor {
   two_bit_Predictor() { PHT.fill(2); }
 
   bool predict(u_int32_t x) override {
     if (PHT[hash(x)] >= 2) return true;
     return false;
   };
-  void is_right(u_int32_t x) override {
-    right_count++;
-    total_count++;
+  void is_branch(u_int32_t x) override {
     PHT[hash(x)] = PHT[hash(x)] + (PHT[hash(x)] != 3);
   };
-  void is_wrong(u_int32_t x) override {
-    total_count++;
+  void not_branch(u_int32_t x) override {
     PHT[hash(x)] = PHT[hash(x)] - (PHT[hash(x)] != 0);
   }
 
-  u_int32_t hash(u_int32_t x) {
-    return ((x>>2)^(x>>14)^(x>>26))&0xFFF;
-  }
+  u_int32_t hash(u_int32_t x) { return ((x >> 2) ^ (x >> 14) ^ (x >> 26)) & 0xFFF; }
   std::array<u_char, 4096> PHT{};
 };
 
@@ -56,12 +56,12 @@ struct global_Predictor : Predictor {
     if (GHT[history] >= 2) return true;
     return false;
   };
-  void is_right(u_int32_t x) override {
+  void is_branch(u_int32_t x) override {
     total_count++;
     right_count++;
     history = history << 1 | 1;
   }
-  void is_wrong(u_int32_t x) override;
+  void not_branch(u_int32_t x) override;
   std::array<u_char, 16> GHT{};
   u_char history = 0;
 };

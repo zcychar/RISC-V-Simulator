@@ -6,9 +6,8 @@
 #include "../include/LSB.h"
 #include "../include/RS.h"
 #include "../include/memory.h"
-#include "../include/register.h"
 #include "../include/predictor.h"
-
+#include "../include/register.h"
 
 int sjtu::RoB::load(RoBEntry entry) {
   int tmp = list_next.push(entry);
@@ -42,15 +41,20 @@ void sjtu::RoB::evaluate(RS &rs, LSB &lsb, Predictor &predictor) {
         break;
       }
       case toaddr: {
+        if (list[list.first].value == 1) {
+          predictor.is_branch(list[list.first].addr);
+        } else {
+          predictor.not_branch(list[list.first].addr);
+        }
         if (list[list.first].value == (list[list.first].alt_addr != list[list.first].addr + 4)) {
           // std::cerr<<"ROB: commit addr:"<<list[list.first].addr<<" wrong prediction change
           // to:"<<list[list.first].alt_addr<<std::endl;
           pc_next = list[list.first].alt_addr;
           reset_next = true;
-          predictor.is_wrong(list[list.first].addr);
+          predictor.is_wrong();
         } else {
           // std::cerr<<"ROB: commit addr:"<<list[list.first].addr<<" right prediction \n";
-          predictor.is_right(list[list.first].addr);
+          predictor.is_right();
         }
         break;
       }
