@@ -1,4 +1,0 @@
-/home/zcy/cpu-simulator/RISC-V-Simulator/cmake-build-debug/CMakeFiles/code.dir
-/home/zcy/cpu-simulator/RISC-V-Simulator/cmake-build-debug/CMakeFiles/test.dir
-/home/zcy/cpu-simulator/RISC-V-Simulator/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/zcy/cpu-simulator/RISC-V-Simulator/cmake-build-debug/CMakeFiles/rebuild_cache.dir

@@ -1,1 +1,0 @@
-/usr/bin/c++  -O2 -g CMakeFiles/code.dir/src/LSB.cpp.o CMakeFiles/code.dir/src/RS.cpp.o CMakeFiles/code.dir/src/RoB.cpp.o CMakeFiles/code.dir/src/decoder.cpp.o CMakeFiles/code.dir/src/instruction.cpp.o CMakeFiles/code.dir/src/main.cpp.o CMakeFiles/code.dir/src/memory.cpp.o -o code 
