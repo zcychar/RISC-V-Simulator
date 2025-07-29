@@ -3,7 +3,7 @@
 namespace sjtu {
 
 class Predictor {
-public:
+ public:
   virtual ~Predictor() = default;
   virtual bool predict(u_int32_t x) { return true; };
 
@@ -35,12 +35,8 @@ struct two_bit_Predictor : Predictor {
     if (PHT[hash(x)] >= 2) return true;
     return false;
   };
-  void is_branch(u_int32_t x) override {
-    PHT[hash(x)] = PHT[hash(x)] + (PHT[hash(x)] != 3);
-  };
-  void not_branch(u_int32_t x) override {
-    PHT[hash(x)] = PHT[hash(x)] - (PHT[hash(x)] != 0);
-  }
+  void is_branch(u_int32_t x) override { PHT[hash(x)] = PHT[hash(x)] + (PHT[hash(x)] != 3); };
+  void not_branch(u_int32_t x) override { PHT[hash(x)] = PHT[hash(x)] - (PHT[hash(x)] != 0); }
 
   u_int32_t hash(u_int32_t x) { return ((x >> 2) ^ (x >> 14) ^ (x >> 26)) & 0xFFF; }
   std::array<u_char, 4096> PHT{};
@@ -57,11 +53,14 @@ struct global_Predictor : Predictor {
     return false;
   };
   void is_branch(u_int32_t x) override {
-    total_count++;
-    right_count++;
+    GHT[history] = GHT[history] + (GHT[history] != 3);
     history = history << 1 | 1;
   }
-  void not_branch(u_int32_t x) override;
+  void not_branch(u_int32_t x) override {
+    GHT[history] = GHT[history] - (GHT[history] != 0);
+    history = history << 1;
+  }
+
   std::array<u_char, 16> GHT{};
   u_char history = 0;
 };

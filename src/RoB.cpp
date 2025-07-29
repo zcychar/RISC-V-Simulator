@@ -41,15 +41,28 @@ void sjtu::RoB::evaluate(RS &rs, LSB &lsb, Predictor &predictor) {
         break;
       }
       case toaddr: {
+
+        if(list[list.first].addr==0x1130) {
+          std::cerr<<"!!!!!!!!1"<<list[list.first].alt_addr<<std::endl;
+        }
+
         if (list[list.first].value == 1) {
           predictor.is_branch(list[list.first].addr);
+          if(list[list.first].addr==0x1130) {
+            std::cerr<<"!!!!!!!!2"<<list[list.first].alt_addr<<std::endl;
+          }
         } else {
           predictor.not_branch(list[list.first].addr);
+        }
+
+        if(list[list.first].addr==0x1130) {
+          std::cerr<<"!!!!!!!!3"<<list[list.first].alt_addr<<std::endl;
         }
         if (list[list.first].value == (list[list.first].alt_addr != list[list.first].addr + 4)) {
           // std::cerr<<"ROB: commit addr:"<<list[list.first].addr<<" wrong prediction change
           // to:"<<list[list.first].alt_addr<<std::endl;
           pc_next = list[list.first].alt_addr;
+
           reset_next = true;
           predictor.is_wrong();
         } else {
