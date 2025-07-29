@@ -18,7 +18,7 @@
 namespace sjtu {
 class CPU {
  public:
-  CPU() {
+  CPU(int argc, char *argv[]) {
     iu = new IU;
     mem = new memory;
     mu = new MU;
@@ -27,7 +27,11 @@ class CPU {
     rs = new RS(alu);
     reg = new REG;
     decoder = new Decoder;
-    predictor = new two_bit_Predictor;
+    argc == 1        ? predictor = new Static_Predictor
+    : *argv[1] == '0' ? predictor = new two_bit_Predictor
+    : *argv[1] == '1' ? predictor = new global_Predictor
+    : *argv[1] == '2' ? predictor = new gshare_Predictor
+                     : predictor = new tournament_Predictor;
     rob = new RoB(reg);
     g.seed(rd());
   }

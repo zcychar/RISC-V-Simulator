@@ -12,7 +12,7 @@ Static Prediction(always-true)
 | superloop   | 2096271      | 435027           | 55272               | 12.71       |
 | tak         | 3251640      | 60639            | 15160               | 25.00       |
 
-Single 2-bit Saturating Counter(2)
+Single 2-bit Saturating Counter
 
 | Sample      | Clock Cycles | Predictions Made | Correct Predictions | Accuracy(%) |
 |:------------|:-------------|:-----------------|:--------------------|:------------|
@@ -25,3 +25,31 @@ Single 2-bit Saturating Counter(2)
 | queens      | 885097       | 77116            | 56576               | 73.37       |
 | superloop   | 1056226      | 435027           | 408131              | 93.82       |
 | tak         | 3080006      | 60639            | 44754               | 73.81       |
+
+Global History Prediction(8)
+
+| Sample      | Clock Cycles | Predictions Made | Correct Predictions | Accuracy(%) |
+|:------------|:-------------|:-----------------|:--------------------|:------------|
+| basicopt1   | 833105       | 155139           | 123754              | 79.77       |
+| bulgarian   | 633127       | 71493            | 46226               | 64.66       |
+| hanoi       | 274545       | 17457            | 14099               | 80.76       |
+| magic       | 1006749      | 67869            | 43454               | 64.03       |
+| pi          | 192256150    | 39956500         | 25516844            | 63.86       |
+| qsort       | 1707900      | 200045           | 165644              | 82.80       |
+| queens      | 78703        | 5996             | 3778                | 63.01       |
+| superloop   | 1152151      | 435027           | 380175              | 87.39       |
+| tak         | 3012086      | 60639            | 50619               | 83.48       |
+
+tournament 
+
+| Sample      | Clock Cycles | Predictions Made | Correct Predictions | Accuracy(%) |
+|:------------|:-------------|:-----------------|:--------------------|:------------|
+| basicopt1   | 773152       | 155139           | 137758              | 88.80       |
+| bulgarian   | 600963       | 71493            | 51784               | 72.43       |
+| hanoi       | 271289       | 17457            | 14339               | 82.14       |
+| magic       | 952864       | 67869            | 47920               | 70.60       |
+| pi          | 168670862    | 39956500         | 33108853            | 82.86       |
+| qsort       | 1584917      | 200045           | 184505              | 92.23       |
+| queens      | 55790        | 4365             | 2864                | 65.61       |
+| superloop   | 1096907      | 435027           | 396844              | 91.22       |
+| tak         | 3019232      | 60639            | 49913               | 82.31       |

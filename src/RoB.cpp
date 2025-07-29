@@ -51,10 +51,10 @@ void sjtu::RoB::evaluate(RS &rs, LSB &lsb, Predictor &predictor) {
           // to:"<<list[list.first].alt_addr<<std::endl;
           pc_next = list[list.first].alt_addr;
           reset_next = true;
-          predictor.is_wrong();
+          predictor.is_wrong(list[list.first].addr);
         } else {
           // std::cerr<<"ROB: commit addr:"<<list[list.first].addr<<" right prediction \n";
-          predictor.is_right();
+          predictor.is_right(list[list.first].addr);
         }
         break;
       }
