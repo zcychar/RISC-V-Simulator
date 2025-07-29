@@ -2,3 +2,4 @@ sample
 testcases
 *.pdf
 build
+cmake-build-debug
