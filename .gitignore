@@ -3,3 +3,5 @@ testcases
 *.pdf
 build
 cmake-build-debug
+.idea
+.cache

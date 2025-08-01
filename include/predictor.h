@@ -24,8 +24,8 @@ class Predictor {
 
 struct Static_Predictor : Predictor {
   bool predict(u_int32_t x) override { return true; };
-  void is_branch(u_int32_t x) override{};
-  void not_branch(u_int32_t x) override{};
+  void is_branch(u_int32_t x) override {};
+  void not_branch(u_int32_t x) override {};
 };
 
 struct two_bit_Predictor : Predictor {
@@ -91,7 +91,7 @@ struct gshare_Predictor : Predictor {
 };
 
 struct tournament_Predictor : Predictor {
-  tournament_Predictor() { CPHT.fill(3); }
+  tournament_Predictor() { CPHT.fill(2); }
 
   bool predict(u_int32_t x) override {
     if (CPHT[hash(x)] >= 2) return local.predict(x);
